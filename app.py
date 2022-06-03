@@ -7,6 +7,8 @@ import yfinance as yf
 import pandas as pd
 import plotly_express as px
 
+from stocks import stock_list
+
 
 
 # Create a dash instance
@@ -17,16 +19,18 @@ app = Dash(__name__, external_stylesheets=[
 
 server = app.server
 
-# Line plots
-line_plot = px.line(x=[1, 2, 3], y=[4,5,6], title="basic line plots")
+#print(stock_list)
 
-stock_id = "AAPL"
+stock_id = "UNIONBANK.NS"
 start_date = "2017-01-01"
 end_date = "2017-04-30"
 stock_data = yf.download(stock_id, start=start_date, end=end_date)
 stock_data.reset_index(inplace=True)
-# fig = get_stock_price_fig(df)
-# return # plot the graph of fig using DCC function
+
+#print(stock_data.head())
+stock_dict = yf.Ticker(stock_id).info
+print(stock_dict)
+line_plot = px.line(x=stock_data['Date'], y=stock_data['High'], title="basic line plots")
 
 
 
@@ -113,7 +117,7 @@ nav_section= html.Div([
                                                                 searchable=True,
                                                                 nothingFound="No options found",
                                                                 value="SBI",
-                                                                data=['SBI','TCS'],
+                                                                data=stock_list,
                                                                 icon=[DashIconify(icon="radix-icons:magnifying-glass")],
                                                                 style={"width": 200, "marginBottom": 10},
                                                             ),
@@ -170,28 +174,35 @@ nav_section= html.Div([
                     ], className="nav")
 
 # Content section
-content_section = html.Div([
-                            html.Div([
-                                # Logo
-                                # Company name
-                            ], className="header"),
-                            html.Div([
-                                # Description
-                            ], id="description", className="description_ticker"),
-                            html.Div([
+content_section = html.Div([                        
+                            dmc.Group(direction="row",
+                                        children=[
+                                            dmc.Image(src=stock_dict['logo_url'], 
+                                                      alt=stock_dict['shortName'], 
+                                                      caption=stock_dict['sector'], 
+                                                      width=75
+                                                      ),
+                                            dmc.Space(w=500),                                                
+                                            dmc.Text(stock_dict['longName'], size="lg"),
+                                                ]),                                  
                                 # Stock price plot
                                 dcc.Graph(id='stock-plot', figure=line_plot),
-                            ], id="plot-content"),
-                            html.Div([
+                            
+                            
                                 # Indicator plot
-                            ], id="main-content"),
-                            html.Div([
+                           
+                            
                                 # Forecast plot 
-                            ], id="forecast-content"),
+                            
                         ], className="content")
 
 # App layout
-app.layout = html.Div([header_section, nav_section, content_section])
+app.layout = html.Div([
+                        header_section,
+                        dmc.Group(direction="row",
+                                  children = [nav_section, content_section]
+                                  )
+                    ])
 
 
 if __name__ == '__main__':
