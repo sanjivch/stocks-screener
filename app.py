@@ -1,11 +1,12 @@
 from dash import Dash, html, dcc, callback, Output, html, Input, State, no_update
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 import yfinance as yf
 import pandas as pd
 import plotly_express as px
+import plotly.graph_objects as go
 
 from stocks import stock_list
 
@@ -58,7 +59,7 @@ header_section = html.Div([dmc.Header(
                 align="flex-start",
                 children=[
                     dmc.Text(
-                                'Stock Screener and Predictor',
+                                'Stock Screener',
                                 size="xl",
                                 color="gray",
                             ),
@@ -115,7 +116,7 @@ nav_section= html.Div([
                                 type="scroll",
                                 children=[
                                     html.Br(),
-                                    dmc.Title(f"Choose from the options below", order=6),
+                                    dmc.Title(f"Choose from the options below", order=6, style={'color':'gray'}),
                                     dmc.Divider(label=[
                                                         DashIconify(
                                                             icon="ant-design:stock-outlined", width=15, style={"marginRight": 10}
@@ -135,33 +136,41 @@ nav_section= html.Div([
                                                                 clearable=True,
                                                                 searchable=True,
                                                                 nothingFound="No options found",
-                                                                value="SBI",
                                                                 data=stock_list,
+                                                                value="ABB",                                                                
                                                                 icon=[DashIconify(icon="radix-icons:magnifying-glass")],
-                                                                style={"width": 200,},
+                                                                style={"width": 250,},
                                                             ),
-                                                    dmc.Text(id="selected-value"),
                                                     dmc.Group(
                                                         direction="row",
                                                         children= [
-                                                            dmc.DatePicker(
-                                                                id="start-date-picker",
-                                                                label="Start Date",
-                                                                required=True,
-                                                                minDate=date(2012, 8, 5),
-                                                                maxDate=datetime.today(),
-                                                                value=datetime.now().date(),
-                                                                style={"width": 125},
-                                                                ),
-                                                            dmc.DatePicker(
-                                                                        id="end-date-picker",
-                                                                        label="End Date",
-                                                                        required=True,
-                                                                        minDate=date(2012, 8, 5),
+                                                            # dmc.DatePicker(
+                                                            #     id="start-date-picker",
+                                                            #     label="Start Date",
+                                                            #     required=True,
+                                                            #     minDate=date(2012, 8, 5),
+                                                            #     maxDate=datetime.today(),
+                                                            #     value=datetime.now().date(),
+                                                            #     style={"width": 125},
+                                                            #     ),
+                                                            # dmc.DatePicker(
+                                                            #             id="end-date-picker",
+                                                            #             label="End Date",
+                                                            #             required=True,
+                                                            #             minDate=date(2012, 8, 5),
+                                                            #             maxDate=datetime.today(),
+                                                            #             value=datetime.now().date(),
+                                                            #             style={"width": 125},
+                                                            #             ),
+                                                            dmc.DateRangePicker(
+                                                                        id="date-range-picker",
+                                                                        label="Date Range",
+                                                                        #description="You can also provide a description",
+                                                                        minDate=date(2020, 8, 5),
                                                                         maxDate=datetime.today(),
-                                                                        value=datetime.now().date(),
-                                                                        style={"width": 125},
-                                                                        ),
+                                                                        value=[datetime.now().date() - timedelta(days=5), datetime.now().date()],
+                                                                        style={"width": 250},
+                                                                    ),
                                                         ],
                                                     ),
                                                     dmc.Space(h=10),
@@ -171,35 +180,36 @@ nav_section= html.Div([
                                     dmc.Group(
                                         direction="row",
                                         children=[
-                                            dmc.Button("Data",leftIcon=[DashIconify(icon="bx:data")],id="btn-show-data"),# 
+                                            dmc.Button("Fetch Data",leftIcon=[DashIconify(icon="bx:data")],id="btn-show-data", variant="gradient",
+            gradient={"from": "indigo", "to": "cyan"}),# 
                                             dmc.Space(w=10),
                                             # Indicators button
-                                            dmc.Button("Indicators", leftIcon=[DashIconify(icon="carbon:summary-kpi")],), #carbon:summary-kpi
+                                            #dmc.Button("Indicators", leftIcon=[DashIconify(icon="carbon:summary-kpi")],), #carbon:summary-kpi
                                         ]
                                     ),
                                     
                                     # ant-design:stock-outlined
-                                    dmc.Divider(label=[DashIconify(
-                        icon="wpf:future", width=15, style={"marginRight": 10}
-                    ),"Forecast"],style={"marginBottom": 20, "marginTop": 20},),
-                                    dmc.Group(
-                                        direction="column",
-                                        children=[
+                    #                 dmc.Divider(label=[DashIconify(
+                    #     icon="wpf:future", width=15, style={"marginRight": 10}
+                    # ),"Forecast"],style={"marginBottom": 20, "marginTop": 20},),
+                    #                 dmc.Group(
+                    #                     direction="column",
+                    #                     children=[
                                             
-                                            # Number of days of forecast input
-                                            dmc.NumberInput(
-                                                label="Number of days",
-                                                description="From 0 to infinity, in steps of 5",
-                                                value=5,
-                                                min=0,
-                                                step=5,
-                                                required=True,
-                                                style={"width": 250},
-                                            ),
-                                            # Forecast button
-                                            dmc.Button("Forecast",leftIcon=[DashIconify(icon="carbon:forecast-lightning")],),#
-                                        ],
-                                    ),
+                    #                         # Number of days of forecast input
+                    #                         dmc.NumberInput(
+                    #                             label="Number of days",
+                    #                             description="From 0 to infinity, in steps of 5",
+                    #                             value=5,
+                    #                             min=0,
+                    #                             step=5,
+                    #                             required=True,
+                    #                             style={"width": 250},
+                    #                         ),
+                    #                         # Forecast button
+                    #                         dmc.Button("Forecast",leftIcon=[DashIconify(icon="carbon:forecast-lightning")],),#
+                    #                     ],
+                    #                 ),
                                 ],
                             )
                         ],
@@ -211,19 +221,22 @@ nav_section= html.Div([
 content_section = html.Div([dmc.Space(h=50),                        
                             dmc.Group(direction="row",
                                         children=[
-                                            dmc.Space(h=20),
-                                            # dmc.Image(src=stock_dict['logo_url'], 
-                                            #           alt=stock_dict['shortName'], 
-                                            #           caption=stock_dict['sector'], 
-                                            #           width=75
-                                            #           ),
+                                            dmc.Space(h=30),
+                                            dmc.Image(id='stock-img-url',
+                                                      #src=stock_dict['logo_url'], 
+                                                      #alt=stock_dict['shortName'], 
+                                                      #caption=stock_dict['sector'], 
+                                                      width=75,
+                                                      
+                                                      ),
                                             dmc.Space(w=500),                                                
-                                            # dmc.Text(stock_dict['longName'], size="lg"),
+                                            dmc.Text(id="stock-name", size="lg",),
                                                 ]), 
                                 dmc.Text(id='display-stock-info'),                               
                                 # Stock price plot
-                                dcc.Graph(id='stock-plot',),# figure=line_plot),
-                                dcc.Graph(id='indicator-plot',),# figure=scatter_plot),
+                                
+                                dcc.Graph(id='stock-plot',config={"displayModeBar": False}),# figure=line_plot),
+                                dcc.Graph(id='indicator-plot',config={"displayModeBar": False}),# figure=scatter_plot),
                             
                             
                                 # Indicator plot
@@ -243,31 +256,82 @@ app.layout = html.Div([
 
 
 
-@app.callback(Output('display-stock-info', 'children'),
-                [Input('btn-show-data', 'n_clicks')],
-                [State('stock-select', 'value'),State('start-date-picker', 'value'), State('end-date-picker', 'value')])
+# @app.callback([Output('display-stock-info', 'src')],
+#                 [Input('btn-show-data', 'n_clicks')],
+#                 [
+#                     State('stock-select', 'value'),
+#                     State('start-date-picker', 'value'), 
+#                     State('end-date-picker', 'value')
+#                 ]
+#             )
 
-def update_output(clicked, input1, input2, input3):
-    if clicked:
-        stock_id = input1+".NS"
-        start_time = input2
-        end_time = input3
-        return 'Data: ' + stock_id + start_time + end_time
+# def update_output(clicked, input1, input2, input3):
+#     if clicked:
+#         stock_id = input1+".NS"
+#         start_time = input2
+#         end_time = input3
+#         return 'Data: ' + stock_id + ' ' + start_time + ' ' + end_time
 
-@app.callback(Output('stock-plot', 'figure'),
-                [Input('btn-show-data', 'n_clicks')],
-                [State('stock-select', 'value'),State('start-date-picker', 'value'), State('end-date-picker', 'value')])
+@app.callback([
+                Output('stock-img-url', 'src'),
+                Output('stock-img-url', 'caption'),
+                Output('stock-name', 'children'),
+                Output('stock-plot', 'figure'),
+                Output('indicator-plot', 'figure')
 
-def update_line_plot(clicked, stock_id, start_date, end_date):
-    if clicked:
-        if stock_id == '':
-            stock_id = 'SBIN.NS'
-        else:
-            stock_id = stock_id+".NS"
+              ],
+              [
+                  Input('btn-show-data', 'n_clicks')
+              ],
+              [
+                  State('stock-select', 'value'),
+                  State('date-range-picker', 'value'), 
+                  #State('end-date-picker', 'value')
+              ]
+             )
+
+def update_stock_info(btn_data_clicked, stock_id, date_range):
+    if btn_data_clicked:
+        stock_id = stock_id+".NS"
+        start_date = date_range[0]
+        end_date = date_range[1]
+        stock_info = yf.Ticker(stock_id).info
+        print(stock_info)
         stock_data = yf.download(stock_id, start=start_date, end=end_date)
         stock_data.reset_index(inplace=True)
         
-        return px.line(x=stock_data['Date'], y=stock_data['High'], title="basic line plots")
+        stock_ohlc_plot = go.Figure(data=go.Ohlc(x=stock_data['Date'],
+                open=stock_data['Open'],
+                high=stock_data['High'],
+                low=stock_data['Low'],
+                close=stock_data['Close']))
+        stock_ohlc_plot.update(layout_xaxis_rangeslider_visible=False)
+
+        stock_line_plot = px.line(x=stock_data['Date'], y=stock_data['High'], title=f"{stock_info['shortName']}")
+        stock_data['EWA_20'] = stock_data['Close'].ewm(span=20, adjust=False).mean()
+        stock_scatter_plot = px.scatter(stock_data,
+                                        x= stock_data['Date'],
+                                        y= stock_data['EWA_20'],
+                                        title="Exponential Moving Average vs Date")
+
+        return stock_info['logo_url'], stock_info['sector'],  stock_info['longName'], stock_ohlc_plot, stock_scatter_plot
+
+
+
+# @app.callback(Output('stock-plot', 'figure'),
+#                 [Input('btn-show-data', 'n_clicks')],
+#                 [State('stock-select', 'value'),State('start-date-picker', 'value'), State('end-date-picker', 'value')])
+
+# def update_line_plot(clicked, stock_id, start_date, end_date):
+#     if clicked:
+#         if stock_id == '':
+#             stock_id = 'SBIN.NS'
+#         else:
+#             stock_id = stock_id+".NS"
+#         stock_data = yf.download(stock_id, start=start_date, end=end_date)
+#         stock_data.reset_index(inplace=True)
+        
+#         return px.line(x=stock_data['Date'], y=stock_data['High'], title="basic line plots")
 
 
 # @app.callback(Output('indicator-plot', 'figure'),
