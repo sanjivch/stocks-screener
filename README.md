@@ -9,7 +9,7 @@ The python code for this project consist of the following files
 3. `model.py` - Machine learning model to forecast stock price. TODO
 
 ## Folder structure
-
+```
 .
 └── stocks-screener-and-predictor
     ├── assets
@@ -21,6 +21,7 @@ The python code for this project consist of the following files
     ├── requirements.txt
     ├── LICENSE
     └── README.md
+ ```
 
 ## Python libraries used
 
