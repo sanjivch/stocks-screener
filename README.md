@@ -10,7 +10,8 @@ The python code for this project consist of the following files
 
 ## Folder structure
 
-├── stocks-screener-and-predictor
+.
+└── stocks-screener-and-predictor
     ├── assets
     │    └── app.css
     ├── app.py
