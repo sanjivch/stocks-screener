@@ -1,12 +1,12 @@
-# Stocks Screener and Predictor
+# Stocks Screener
 
-This repo use Plotly-dash to screen and predict stocks. yFinance library is used to fetch the data for the stocks. only the top 200 NSE listed stocks are analysed in this project.
+This repo use Plotly-dash to screen stocks. `yFinance` python library is used to fetch the data for the stocks. Only the top 200 NSE listed stocks are analysed in this project.
 
-The python code for this project consist of the following files
+The python code for this project consist of the following files:
 
 1. `app.py` - Flask server to run the Dash application
 2. `stocks.py` - contains the list of top 200 NSE stocks
-3. `model.py` - Machine learning model to forecast stock price. TODO
+
 
 ## Folder structure
 ```
@@ -15,7 +15,6 @@ The python code for this project consist of the following files
     ├── assets
     │    └── app.css
     ├── app.py
-    ├── model.py
     ├── stocks.py
     ├── Procfile
     ├── requirements.txt
