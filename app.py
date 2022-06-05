@@ -167,7 +167,6 @@ nav_section = html.Div(
                                         dmc.Group(
                                             direction="row",
                                             children=[
-                                                
                                                 dmc.DateRangePicker(
                                                     id="date-range-picker",
                                                     label="Date Range",
@@ -188,15 +187,21 @@ nav_section = html.Div(
                                 ),
                                 dmc.Group(
                                     direction="row",
-                                    id='loading-data',
+                                    id="loading-data",
                                     children=[
-                                        dmc.LoadingOverlay(dmc.Button(
-                                            "Fetch Data",
-                                            leftIcon=[DashIconify(icon="bx:data")],
-                                            id="btn-fetch-data",
-                                            variant="gradient",
-                                            gradient={"from": "indigo", "to": "cyan"},
-                                        ), loaderProps={'size':"xs"}), #
+                                        dmc.LoadingOverlay(
+                                            dmc.Button(
+                                                "Fetch Data",
+                                                leftIcon=[DashIconify(icon="bx:data")],
+                                                id="btn-fetch-data",
+                                                variant="gradient",
+                                                gradient={
+                                                    "from": "indigo",
+                                                    "to": "cyan",
+                                                },
+                                            ),
+                                            loaderProps={"size": "xs"},
+                                        ),  #
                                         dmc.Space(w=10),
                                         # Indicators button
                                         # dmc.Button("Indicators", leftIcon=[DashIconify(icon="carbon:summary-kpi")],), #carbon:summary-kpi
@@ -235,8 +240,8 @@ nav_section = html.Div(
 )
 
 # Content section
-content_section = html.Div(style={"width": 900},
-
+content_section = html.Div(
+    style={"width": 900},
     children=[
         dmc.Space(h=50),
         dmc.Group(
@@ -255,14 +260,25 @@ content_section = html.Div(style={"width": 900},
                     id="stock-name",
                     size="lg",
                 ),
-                dmc.Badge(id="stock-recommendation", variant="filled",),
+                dmc.Badge(
+                    id="stock-recommendation",
+                    variant="filled",
+                ),
             ],
         ),
         dmc.Accordion(
             children=[
-                dmc.AccordionItem([
-                    dmc.Text(id="pe-ratio", size="xs",),
-                    dmc.Text(id="peg-ratio", size="xs",),],
+                dmc.AccordionItem(
+                    [
+                        dmc.Text(
+                            id="pe-ratio",
+                            size="xs",
+                        ),
+                        dmc.Text(
+                            id="peg-ratio",
+                            size="xs",
+                        ),
+                    ],
                     label=[
                         DashIconify(
                             icon="icon-park-solid:analysis",
@@ -270,13 +286,28 @@ content_section = html.Div(style={"width": 900},
                             style={"marginRight": 10},
                         ),
                         "Fundamental Analysis",
-                        
                     ],
                 ),
-                dmc.AccordionItem(
-                    "Configure temp appearance and behavior with vast amount of settings or overwrite any part of component "
-                    "styles",
-                    label="Flexibility",
+                dmc.AccordionItem([
+                        dmc.Text(
+                            id="ebidta-margins",
+                            size="xs",
+                        ),
+                        dmc.Text(
+                            id="profit-margins",
+                            size="xs",
+                        ),
+                        dmc.Text(
+                            id="gross-margins",
+                            size="xs",
+                        ),
+                    ],
+                    label=[
+                        DashIconify(
+                            icon="icon-park-outline:equal-ratio",
+                            width=15,
+                            style={"marginRight": 10},
+                        ),"Margins",]
                 ),
             ],
         ),
@@ -302,9 +333,8 @@ app.layout = html.Div(
 )
 
 
-
 @app.callback(
-    [   
+    [
         Output("btn-fetch-data", "children"),
         Output("stock-img-url", "src"),
         Output("stock-img-url", "caption"),
@@ -313,6 +343,9 @@ app.layout = html.Div(
         Output("stock-recommendation", "color"),
         Output("pe-ratio", "children"),
         Output("peg-ratio", "children"),
+        Output("ebidta-margins", "children"),
+        Output("profit-margins", "children"),
+        Output("gross-margins", "children"),
         Output("stock-plot", "figure"),
         Output("indicator-plot", "figure"),
     ],
@@ -330,7 +363,12 @@ def update_stock_info(btn_data_clicked, stock_id, date_range):
         end_date = date_range[1]
         stock_info = yf.Ticker(stock_id).info
         stock_recommendation = stock_info["recommendationKey"]
-        recommendation_color = {"none":"gray","hold":"orange", "buy":"green", "sell":"red"}
+        recommendation_color = {
+            "none": "gray",
+            "hold": "orange",
+            "buy": "green",
+            "sell": "red",
+        }
         print(stock_info)
         stock_data = yf.download(stock_id, start=start_date, end=end_date)
         stock_data.reset_index(inplace=True)
@@ -358,7 +396,7 @@ def update_stock_info(btn_data_clicked, stock_id, date_range):
             y=stock_data["EWA_20"],
             title="Exponential Moving Average vs Date",
         )
-
+        tab = '\t'
         return (
             no_update,
             stock_info["logo_url"],
@@ -366,8 +404,11 @@ def update_stock_info(btn_data_clicked, stock_id, date_range):
             stock_info["longName"],
             stock_recommendation,
             recommendation_color[stock_recommendation],
-            f"PE Ratio  : {stock_info['forwardPE']}",
+            f"PE Ratio : {stock_info['forwardPE']}",
             f"PEG Ratio : {stock_info['pegRatio']}",
+            f"EBIDTA Margins : {stock_info['ebitdaMargins']}",
+            f"Profit Margins : {stock_info['profitMargins']}",
+            f"Gross Margins : {stock_info['grossMargins']}",
             stock_ohlc_plot,
             stock_scatter_plot,
         )
